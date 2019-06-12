@@ -59,6 +59,7 @@ $autoload['packages'] = array();
 |	$autoload['libraries'] = array('user_agent' => 'ua');
 */
 //$autoload['libraries'] = array();
+// 'session' 启用 $_SESSION功能
 $autoload['libraries'] = array('Permission');
 
 

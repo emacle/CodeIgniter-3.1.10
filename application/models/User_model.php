@@ -152,7 +152,7 @@ class User_model extends CI_Model
         $query = $this->db->query($sql);
         if (empty($query->result_array())) {
             return FALSE;
-         } else {
+        } else {
             return TRUE;
         }
     }
@@ -473,6 +473,19 @@ class User_model extends CI_Model
         return $query->result_array();
     }
 
+    /*
+     * 微信登录认证
+     */
+    function getUserInfoByTel($Tel)
+    {
+        $sql = "SELECT
+                   u.*
+                FROM
+                    sys_user u
+                 WHERE u.tel='" . $Tel . "'";
+        $query = $this->db->query($sql);
+        return $query->result_array();
+    }
 
     /***********************
      * 用户模型部分结束

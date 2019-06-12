@@ -203,6 +203,11 @@ $config['auth_library_function'] = '';
 // ---Uncomment list line for the wildard unit test
 // $config['auth_override_class_method_http']['wildcard_test_cases']['*']['options'] = 'basic';
 
+// 覆盖Class User 里的 verifycode 的 get 请求 auth 方法为 none， *类名为小写 user*
+// 验证码图片的 <img src 直接get请求, 不容易加上请求 header, 因此不能使用 x-api-key header
+// this.VerificationImg = 'http://www.cirest.com:8889/api/v3/sys/user/verifycode?verify=' + this.verify
+$config['auth_override_class_method_http']['user']['verifycode']['get'] = 'none';
+
 /*
 |--------------------------------------------------------------------------
 | REST Login Usernames

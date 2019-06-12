@@ -454,6 +454,18 @@ class User extends REST_Controller
     {
         $username = $this->post('username'); // POST param
         $password = $this->post('password'); // POST param
+        $verify = $this->post('verify'); // POST param
+        $verifycode = $this->post('verifycode'); // POST param
+
+        $this->load->driver('cache');
+        if ($verifycode !== $this->cache->redis->get($verify)) {
+            $message = [
+                "code" => 60205,
+                "message" => '验证码错误！'
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
 
         $result = $this->User_model->validate($username, md5($password));
 
@@ -529,7 +541,7 @@ class User extends REST_Controller
             if ($Token !== $this->get('token')) {
                 // 由前台切换角色 修改sys_user_token 表里 role_id 字段 并替换用户信息中的默认role_id
                 // 判断切换后的角色是否有对应机构
-                if(!$this->User_model->roleHasDept($this->get('token'), $info['id'])){
+                if (!$this->User_model->roleHasDept($this->get('token'), $info['id'])) {
                     $message = [
                         "code" => 20000,
                         "type" => 'error',
@@ -1058,8 +1070,7 @@ class User extends REST_Controller
      * GET 请求
      * @param string $url
      */
-    private
-    function http_get($url)
+    private function http_get($url)
     {
         $oCurl = curl_init();
         if (stripos($url, "https://") !== FALSE) {
@@ -1207,5 +1218,211 @@ class User extends REST_Controller
             echo json_encode(array("success" => false, "msg" => $userIdInfo["errmsg"]));
             die();
         }
+    }
+
+    function verifycode_get()
+    {
+        $this->load->library('Captcha');
+        // redis/mysql 保存 code 与 verify
+        $code = $this->captcha->getCaptcha();
+        $this->load->driver('cache');
+        $ret = $this->cache->redis->save($this->get('verify'), $code, 60);
+        // response header 出现 redis_hit_verifycode: 1 表示 redis 连接正常且保存k/v
+        header("redis_hit_verifycode: " . $ret);
+        // header("veryfiycode: " . $this->get('verify') . "/" . $code);
+        $this->captcha->showImg();
+    }
+
+    function corpauth_get()
+    {
+        $code = $this->get('code');
+
+        // $corpId = 'xxxxxx';
+        // $appSecret = 'xxxxxx';
+
+
+        // code: 60206 微信认证失败统一代码
+        if (!$code) {
+            $message = [
+                "code" => 60206,
+                "data" => ["status" => 'fail', "msg" => 'code参数为空'],
+                "message" => "code参数为空"
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+
+        // 根据上面的回调参数获取用户详细信息。 已经传递过来code数据。
+        $getCorpAccessTokenUrl = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=' . $corpId . '&corpsecret=' . $appSecret;
+
+        $tokenInfo = $this->http_get($getCorpAccessTokenUrl);
+        $tokenInfo = json_decode($tokenInfo["content"], true); // 获取的原始数据解码成json格式，如下
+        //        array(4) {
+        //        ["errcode"]=>
+        //              int(0)
+        //              ["errmsg"]=>
+        //              string(2) "ok"
+        //                    ["access_token"]=>
+        //              string(214) "vP2TgGlg8-_N23PleQnq2q9SBnIfqCkkNMGZ71YoZ8V3R0lB8sJOy15ixco4kOxo8GZMlcgiJHm0hDXzbL6lG2BWleAqmJCrMEPdQj9goZaogVNBICmVrr-Fxz8YCIBUdf36BOq4E-Mt64OCrIUw1254Pxupi9RGOEFoWmMrJKgHnR_F0pjD-hJFZfTOIt7W2VujJq6hsle8SD9qTOZwzA"
+        //                    ["expires_in"]=>
+        //              int(7200)
+        //            }
+        if ($tokenInfo["errcode"] == 0) {
+            $accessToken = $tokenInfo["access_token"];
+        } else {
+            $message = [
+                "code" => 60206,
+                "data" => ["status" => 'fail', "msg" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"],
+                "message" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+
+        $getUserIdUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=' . $accessToken . '&code=' . $code;
+        $ajaxUserIdInfo = $this->http_get($getUserIdUrl);
+        $userIdInfo = json_decode($ajaxUserIdInfo["content"], true); // 获取的原始数据解码成json格式，如下
+        //        array(4) {
+        //                ["UserId"]=>
+        //          string(7) "QiaoKun"
+        //                ["DeviceId"]=>
+        //          string(0) ""
+        //                ["errcode"]=>
+        //          int(0)
+        //          ["errmsg"]=>
+        //          string(2) "ok"
+        //        }
+
+        if ($userIdInfo["errcode"] == 0) {
+            if (array_key_exists("OpenId", $userIdInfo)) {
+                $message = [
+                    "code" => 60206,
+                    "data" => ["success" => 'fail', "msg" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"],
+                    "message" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"
+                ];
+                $this->set_response($message, REST_Controller::HTTP_OK);
+                return;
+
+            } else if (array_key_exists("UserId", $userIdInfo)) {
+                $getUserInfoUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=' . $accessToken . '&userid=' . $userIdInfo["UserId"];
+                $ajaxUserInfo = $this->http_get($getUserInfoUrl);
+                $userInfo = json_decode($ajaxUserInfo["content"], true); // 获取的原始数据解码成json格式，如下
+                //                array(21) {
+                //                    ["errcode"]=>
+                //                      int(0)
+                //                      ["errmsg"]=>
+                //                      string(2) "ok"
+                //                                        ["userid"]=>
+                //                      string(7) "QiaoKun"
+                //                                        ["name"]=>
+                //                      string(6) "乔锟"
+                //                      ["position"]=>
+                //                      string(0) ""
+                //                                        ["mobile"]=>
+                //                      string(11) "13633838282"
+                //                                        ["gender"]=>
+                //                      string(1) "1"
+                //                                        ["email"]=>
+                //                      string(22) "qiaok@hn.cmtietong.com"
+                //                                        ["avatar"]=>
+                //                      string(85) "http://p.qlogo.cn/bizmail/rZXu0u7ma4vOiaEWia7MTnUDmdDnfgh7R6iafX5832RczKmViadvgbVAhw/"
+                //                                        ["status"]=>
+                //                      int(1)
+                //                    }
+
+                if ($userInfo["errcode"] == 0) {
+                    $user = $this->User_model->getUserInfoByTel($userInfo["mobile"]);
+                    //                    array(1) {
+                    //                                            [0]=>
+                    //                      array(12) {
+                    //                                                ["id"]=>
+                    //                        string(1) "1"
+                    //                                                ["username"]=>
+                    //                        string(5) "admin"
+                    //                                                ["tel"]=>
+                    //                        string(11) "13633838282"
+                    //                                                ["email"]=>
+                    //                        string(17) "lmxdawn@gmail.com"
+                    //
+                    //                      }
+                    //                    }
+
+                    if (!empty($user)) {
+                        // 成功，生成token 并根据token生成loginfo 并且将信息及 token 返回前台登录
+                        $Token = $this->_generate_token();
+                        $create_time = time();
+                        $expire_time = $create_time + 2 * 60 * 60;  // 2小时过期
+
+                        $lastLoginRet = $this->User_model->getLastLoginRole($user[0]['id']);
+
+                        if ($lastLoginRet['code'] == '20000') {
+                            $CurrentRole = $lastLoginRet['role_id'];
+                        } else {
+                            $ret = $this->User_model->getCurrentRole($user[0]['id']);
+                            if ($ret['code'] !== '20000') {
+                                // 自定义code 未分配角色或角色被删除，用户没有可用角色
+                                $this->set_response($ret, REST_Controller::HTTP_OK);
+                                return;
+                            }
+                            $CurrentRole = $ret['role_id'];
+                        }
+
+                        $data = [
+                            'user_id' => $user[0]['id'],
+                            'role_id' => $CurrentRole,
+                            'expire_time' => $expire_time,
+                            'create_time' => $create_time
+                        ];
+
+                        // TODO: 考虑sys_user_token 表加入类型字段判断是微信登录生成 token 还是账号密码登录生成 token
+                        if (!$this->_insert_token($Token, $data)) {
+                            $message = [
+                                "code" => 60206,
+                                "data" => ["status" => 'fail', "msg" => "Token 创建失败, 请联系管理员."],
+                                "message" => 'Token 创建失败, 请联系管理员.'
+                            ];
+                            $this->set_response($message, REST_Controller::HTTP_OK);
+                            return;
+                        }
+
+                        $message = [
+                            "code" => 20000,
+                            "data" => [
+                                "status" => 'ok',
+                                "token" => $Token
+                            ]
+                        ];
+                        $this->set_response($message, REST_Controller::HTTP_OK);
+
+                    } else {
+                        $message = [
+                            "code" => 60206,
+                            "data" => ["status" => 'fail', "msg" => "此微信账号(" . $userInfo['name'] . ")没有与系统账号关联,请联系系统管理员!"],
+                            "message" => "此微信账号(" . $userInfo['name'] . ")没有与系统账号关联,请联系系统管理员!"
+                        ];
+                        $this->set_response($message, REST_Controller::HTTP_OK);
+                        return;
+                    }
+
+                } else {
+                    $message = [
+                        "code" => 60206,
+                        "data" => ["status" => 'fail', "msg" => $userInfo["errmsg"]],
+                        "message" => userInfo["errmsg"]
+                    ];
+                    $this->set_response($message, REST_Controller::HTTP_OK);
+                    return;
+                }
+            }
+        } else {
+            $message = [
+                "code" => 60206,
+                "data" => ["status" => 'fail', "msg" => $userIdInfo["errmsg"]],
+                "message" => $userIdInfo["errmsg"]
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+
     }
 }
