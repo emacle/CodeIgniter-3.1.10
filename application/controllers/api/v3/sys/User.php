@@ -1323,7 +1323,6 @@ class User extends REST_Controller
                 //                                        ["gender"]=>
                 //                      string(1) "1"
                 //                                        ["email"]=>
-                //                      string(22) "qiaok@hn.cmtietong.com"
                 //                                        ["avatar"]=>
                 //                      string(85) "http://p.qlogo.cn/bizmail/rZXu0u7ma4vOiaEWia7MTnUDmdDnfgh7R6iafX5832RczKmViadvgbVAhw/"
                 //                                        ["status"]=>
