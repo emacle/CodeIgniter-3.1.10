@@ -1155,13 +1155,14 @@ class User extends REST_Controller
             echo "options";
             die();
         }
-        $corpId = "ww89579c6928205114";
-        // $localAuthUrl = "http://dj.cttha.com:7000/hotcode/";
-        $agentId = "1000003";
-        $appSecret = "9f-VZWi6agTDgPXZQF3o0pLDkVAj0SXSO-ptfsTu7s4";
-        $localAuthUrl = "http://dj.cttha.com:7000/hotcode/";
+        // $corpId = "wwxxxxxxxx";
+        // $agentId = "100000";
+        // $appSecret = "fsdfsfsdf";
+        // $localAuthUrl = "http://dj.xxx.com:7000/hotcode/";
+
         if (!array_key_exists("code", $_REQUEST)) {
-            $redirectUri = urlencode("http://yw.cttha.com/ksh/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
+
+            // $redirectUri = urlencode("http://yw.xxx.com/xxx/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
             echo json_encode(array("success" => false, "authUrl" => $authUrl));
             die();
@@ -1240,7 +1241,6 @@ class User extends REST_Controller
         // $corpId = 'xxxxxx';
         // $appSecret = 'xxxxxx';
 
-
         // code: 60206 微信认证失败统一代码
         if (!$code) {
             $message = [
@@ -1284,7 +1284,6 @@ class User extends REST_Controller
         $userIdInfo = json_decode($ajaxUserIdInfo["content"], true); // 获取的原始数据解码成json格式，如下
         //        array(4) {
         //                ["UserId"]=>
-        //          string(7) "QiaoKun"
         //                ["DeviceId"]=>
         //          string(0) ""
         //                ["errcode"]=>
@@ -1313,13 +1312,10 @@ class User extends REST_Controller
                 //                      ["errmsg"]=>
                 //                      string(2) "ok"
                 //                                        ["userid"]=>
-                //                      string(7) "QiaoKun"
                 //                                        ["name"]=>
-                //                      string(6) "乔锟"
                 //                      ["position"]=>
                 //                      string(0) ""
                 //                                        ["mobile"]=>
-                //                      string(11) "13633838282"
                 //                                        ["gender"]=>
                 //                      string(1) "1"
                 //                                        ["email"]=>
@@ -1339,7 +1335,6 @@ class User extends REST_Controller
                     //                                                ["username"]=>
                     //                        string(5) "admin"
                     //                                                ["tel"]=>
-                    //                        string(11) "13633838282"
                     //                                                ["email"]=>
                     //                        string(17) "lmxdawn@gmail.com"
                     //
