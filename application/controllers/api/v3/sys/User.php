@@ -566,7 +566,7 @@ class User extends REST_Controller
             $info['roles'] = $this->User_model->getUserRolesByToken($Token);
             $info['role_id'] = $this->User_model->getCurrentRoleByToken($Token); // 当前选择角色
             $info['introduction'] = "I am a super administrator";
-            $info['avatar'] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif";
+            // $info['avatar'] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif";
             $info['name'] = "Super Admin";
             $info['identify'] = "410000000000000000";
             $info['phone'] = "13633838282";
