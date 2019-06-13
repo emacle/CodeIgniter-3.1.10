@@ -489,11 +489,11 @@ class User extends REST_Controller
             echo "options";
             die();
         }
-        $corpId = "ww89579c6928205114";
-        // $localAuthUrl = "http://dj.cttha.com:7000/hotcode/";
-        $agentId = "1000003";
-        $appSecret = "9f-VZWi6agTDgPXZQF3o0pLDkVAj0SXSO-ptfsTu7s4";
-        $localAuthUrl = "http://dj.cttha.com:7000/hotcode/";
+        // $corpId = "wwxxxxxxxx";
+        // $agentId = "100000";
+        // $appSecret = "fsdfsfsdf";
+        // $localAuthUrl = "http://dj.xxx.com:7000/hotcode/";
+
         if (!array_key_exists("code", $_REQUEST)) {
             $redirectUri = urlencode("http://yw.cttha.com/ksh/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
