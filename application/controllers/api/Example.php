@@ -1,5 +1,6 @@
 <?php
 use Restserver\Libraries\REST_Controller;
+use \Firebase\JWT\JWT; //导入JWT
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
@@ -155,6 +156,54 @@ class Example extends REST_Controller {
         ];
 
         $this->set_response($message, REST_Controller::HTTP_NO_CONTENT); // NO_CONTENT (204) being the HTTP response code
+    }
+
+    // 签发Token
+    public function issue_get()
+    {
+        $key = '344'; //key
+        $time = time(); //当前时间
+        $token = [
+            'iss' => 'http://www.helloweba.net', //签发者 可选
+            'aud' => 'http://www.helloweba.net', //接收该JWT的一方，可选
+            'iat' => $time, //签发时间
+            'nbf' => $time, //(Not Before)：某个时间点后才能访问，比如设置time+30，表示当前时间30秒后才能使用
+            'exp' => $time + 7200, //过期时间,这里设置2个小时
+            'data' => [ //自定义信息，不要定义敏感信息
+                'userid' => 1,
+                'username' => '李小龙'
+            ]
+        ];
+
+        $jsonList = [
+            'access_token' => JWT::encode($token, $key),
+        ];
+
+        $this->set_response($jsonList, REST_Controller::HTTP_CREATED);
+    }
+
+    public function verification_post()
+    {
+
+        $key = '344'; //key要和签发的时候一样
+
+        $jwt = $this->post('access_token'); //签发的Token
+        try {
+            JWT::$leeway = 60;//当前时间减去60，把时间留点余地
+            $decoded = JWT::decode($jwt, $key, ['HS256']); //HS256方式，这里要和签发的时候对应
+            $arr = (array)$decoded;
+            print_r($arr);
+        } catch (\Firebase\JWT\SignatureInvalidException $e) {  //签名不正确
+            echo $e->getMessage();
+        } catch (\Firebase\JWT\BeforeValidException $e) {  // 签名在某个时间点之后才能用
+            echo $e->getMessage();
+        } catch (\Firebase\JWT\ExpiredException $e) {  // token过期
+            echo $e->getMessage();
+        } catch (Exception $e) {  //其他错误
+            echo $e->getMessage();
+        }
+        //Firebase定义了多个 throw new，我们可以捕获多个catch来定义问题，catch加入自己的业务，比如token过期可以用当前Token刷新一个新Token
+
     }
 
 }

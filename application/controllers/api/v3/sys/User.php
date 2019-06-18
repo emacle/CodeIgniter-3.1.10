@@ -29,7 +29,6 @@ class User extends REST_Controller
     public function testapi_get()
     {
         echo "test api ok...";
-
         echo APPPATH . "\n";
         echo SELF . "\n";
         echo BASEPATH . "\n";
@@ -1417,6 +1416,5 @@ class User extends REST_Controller
             $this->set_response($message, REST_Controller::HTTP_OK);
             return;
         }
-
     }
 }
