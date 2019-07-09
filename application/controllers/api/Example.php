@@ -1,6 +1,10 @@
 <?php
 use Restserver\Libraries\REST_Controller;
 use \Firebase\JWT\JWT; //导入JWT
+require 'vendor/php-sdk-7.2.8/autoload.php';
+use Qiniu\Auth;
+use Qiniu\Storage\UploadManager;
+
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 // This can be removed if you use __autoload() in config.php OR use Modular Extensions
@@ -205,5 +209,33 @@ class Example extends REST_Controller {
         //Firebase定义了多个 throw new，我们可以捕获多个catch来定义问题，catch加入自己的业务，比如token过期可以用当前Token刷新一个新Token
 
     }
+
+    // 七牛 上传图片测试
+    public function  qiniu_get()
+    {
+        $cfg = [
+            'access' => 'K5w2Fe4XowpU6kuklgLlAhGkXWt111WVssI1R0ff',
+            'secret' => 'i9QhgiUvdO5AgpPnQkPXO6n9wA9jILLeaskqP0Iz',
+            'bucket' => 'pocoyo_bucket',
+            'domain' => 'http://pub8vjaao.bkt.clouddn.com'
+        ];
+
+        $auth = new Auth($cfg['access'], $cfg['secret']);
+        // 创建一个过期时间为1小时的临时上传令牌
+        $token = $auth->uploadToken($cfg['bucket'], null, 3600);
+
+        // 中文名需要转换编码？
+        $filePath =  iconv('UTF-8', 'GBK', APPPATH . 'controllers\api\QQ图片20160922141622.png');
+
+        $uploadMgr = new UploadManager();
+        list($ret, $err) = $uploadMgr->putFile($token, null, $filePath);
+        if($err !== null) {
+            $this->err = $err;
+            var_dump($err);
+        } else {
+            echo $cfg['domain'] . '/' . $ret['key'];
+        }
+    }
+
 
 }

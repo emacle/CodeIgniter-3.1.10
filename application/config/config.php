@@ -23,7 +23,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | a PHP script and you can easily do that on your own.
 |
 */
-$config['base_url'] = 'http://www.vueapi.com:8889/';
+$config['base_url'] = 'http://www.cirest.com:8889/';
 
 /*
 |--------------------------------------------------------------------------
