@@ -237,5 +237,97 @@ class Example extends REST_Controller {
         }
     }
 
+    // Chevereto 图床免费版本地址：https://github.com/Chevereto/Chevereto-Free
+    // https://chevereto.com/docs/api-v1
+    // 上传图片测试
+    public function chevereto_post()
+    {
+        // 1. 上传本地文件时应使用 $fields post base64_encode方法
+        //   Always use POST when uploading local files. Url encoding may alter the base64 source
+        //   due to encoded characters or just by URL request length limit due to GET request.
+        //   base64编码 会导致过长 url request
+        //  var_dump($_FILES); 参考 uploadimg 可以做一些前置校验处理
+        $key = '7212c3c28de8a648c9e473c4c165583d';
+        $url = 'http://172.17.1.110:8888/api/1/upload';
+
+        // What do we send to chevereto api?
+        $fields = array(
+            'key' => urlencode($key),
+            // The image encoded in base64
+             'source' => base64_encode(file_get_contents($_FILES["file"]['tmp_name'])),
+            // format: txt / json  txt 只返回图片地址或错误信息 eg.Duplicated upload 较为简洁
+            'format' => urlencode('json')
+        );
+
+        //open connection
+        $ch = curl_init();
+
+        //set the url, number of POST vars, POST data
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, sizeof($fields));
+        curl_setopt($ch, CURLOPT_HEADER, false);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 240);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect: '));
+
+        //execute post
+        $result = curl_exec($ch);
+        echo $result;
+        //close connection
+
+        // 2. 上传远程图片地址可使用 _get source=urlencode{source} 方法即可
+
+//        $key = '7212c3c28de8a648c9e473c4c165583d';
+//        // 设定远程图片地址
+//        $source = 'https://img3.doubanio.com/view/group_topic/large/public/p67032015.jpg';
+//        // format: txt / json  txt 只返回图片地址或错误信息 eg.Duplicated upload 较为简洁
+//        $url = 'http://172.17.1.110:8888/api/1/upload/?key={key}&source={source}&format=txt';
+//        $url = str_replace(array('{key}','{source}'),array($key,urlencode($source)),$url);
+//
+//         //初始化
+//        $ch = curl_init();
+//        //设置选项，包括URL
+//        curl_setopt($ch, CURLOPT_URL, $url);
+//        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+//        curl_setopt($ch, CURLOPT_HEADER, 0);
+//        //执行并获取HTML文档内容
+//        $output = curl_exec($ch);
+//        //释放curl句柄
+//        curl_close($ch);
+//        echo  $output;
+
+
+// 失败
+//        {
+//            "status_txt": "Bad Request",
+//            "error": {
+//                "context": "Exception",
+//                "code": 102,
+//                "message": "Duplicated upload"
+//            },
+//            "status_code": 400
+//        }
+// 成功
+//        {
+//            "status_txt": "OK",
+//            "image": {
+//                "image": {
+//                        "size": "89163",
+//                    "url": "http://172.17.1.110:8888/images/2019/07/09/p67032015.jpg",
+//                    "extension": "jpg",
+//                    "mime": "image/jpeg",
+//                    "name": "p67032015",
+//                    "filename": "p67032015.jpg"
+//                },
+//            },
+//            "success": {
+//                    "code": 200,
+//                "message": "image uploaded"
+//            },
+//            "status_code": 200
+//        }
+
+    }
 
 }
