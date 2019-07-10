@@ -246,8 +246,8 @@ class Example extends REST_Controller {
         //   Always use POST when uploading local files. Url encoding may alter the base64 source
         //   due to encoded characters or just by URL request length limit due to GET request.
         //   base64编码 会导致过长 url request
-        //  var_dump($_FILES); 参考 uploadimg 可以做一些前置校验处理
-        $key = '7212c3c28de8a648c9e473c4c165583d';
+        //  var_dump($_FILES); 参考 uploadimg 可以做一些前置校验处理  //  前置判断 if (empty($_FILES) === false)
+        $key = '6a55c7f9fa13813c2da613dc7b5b920b';
         $url = 'http://172.17.1.110:8888/api/1/upload';
 
         // What do we send to chevereto api?
@@ -278,7 +278,7 @@ class Example extends REST_Controller {
 
         // 2. 上传远程图片地址可使用 _get source=urlencode{source} 方法即可
 
-//        $key = '7212c3c28de8a648c9e473c4c165583d';
+//        $key = '6a55c7f9fa13813c2da613dc7b5b920b';
 //        // 设定远程图片地址
 //        $source = 'https://img3.doubanio.com/view/group_topic/large/public/p67032015.jpg';
 //        // format: txt / json  txt 只返回图片地址或错误信息 eg.Duplicated upload 较为简洁
