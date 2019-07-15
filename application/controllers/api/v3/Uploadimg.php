@@ -330,8 +330,8 @@ class Uploadimg extends REST_Controller
         //   due to encoded characters or just by URL request length limit due to GET request.
         //   base64编码 会导致过长 url request
         //  var_dump($_FILES); 参考 uploadimg 可以做一些前置校验处理  //  前置判断 if (empty($_FILES) === false)
-        $key = '6a55c7f9fa13813c2da613dc7b5b920b';
-        $url = 'http://172.17.1.110:8888/api/1/upload';
+        $key = '5486424e4dfb6b87453dd4bb25c0dcb0';
+        $url = 'http://172.17.1.110/chevereto/api/1/upload';
 
         // What do we send to chevereto api?
         $fields = array(
@@ -356,6 +356,8 @@ class Uploadimg extends REST_Controller
 
         //execute post
         $result = curl_exec($ch);
+        //释放curl句柄
+        curl_close($ch);
         echo $result;
         //close connection
 
