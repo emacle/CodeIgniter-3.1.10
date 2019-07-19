@@ -74,7 +74,7 @@ class Article extends REST_Controller
             ["id" => 2,
                 "timestamp" => "20180808",
 
-                "author" => "qiaokun",
+                "author" => "pocoyo",
                 "reviewer" => "draft",
                 "title" => "draft",
                 "content_short" => "我是测试数据",

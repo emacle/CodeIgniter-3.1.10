@@ -36,7 +36,8 @@ class Captcha
     private function createImg()
     {
         $this->im = imagecreatetruecolor($this->width, $this->height);
-        $bgColor = imagecolorallocate($this->im, 0, 0, 0);
+//        $bgColor = imagecolorallocate($this->im, 0, 0, 0);
+        $bgColor = imagecolorallocate($this->im, 255, 255, 255);
         imagefill($this->im, 0, 0, $bgColor);
     }
 
@@ -69,7 +70,8 @@ class Captcha
     private function setCaptcha()
     {
         for ($i = 0; $i < $this->codeNum; $i++) {
-            $color = imagecolorallocate($this->im, rand(50, 250), rand(100, 250), rand(128, 250));
+//            $color = imagecolorallocate($this->im, rand(50, 250), rand(100, 250), rand(128, 250));
+            $color = imagecolorallocate($this->im, rand(0, 50), rand(0, 100), rand(0, 128));
             $size = rand(floor($this->height / 5), floor($this->height / 3));
             $x = floor($this->width / $this->codeNum) * $i + 5;
             $y = rand(0, $this->height - 20);
