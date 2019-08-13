@@ -1,6 +1,8 @@
 <?php
 
 use Restserver\Libraries\REST_Controller;
+use Gregwar\Captcha\CaptchaBuilder;
+use Gregwar\Captcha\PhraseBuilder;
 
 defined('BASEPATH') OR exit('No direct script access allowed');
 
@@ -1220,17 +1222,34 @@ class User extends REST_Controller
         }
     }
 
+    // 使用 composer gregwar/captcha 库生成验证码
     function verifycode_get()
     {
-        $this->load->library('Captcha');
-        // redis/mysql 保存 code 与 verify
-        $code = $this->captcha->getCaptcha();
+        $phraseBuilder = new PhraseBuilder(4, '0123456789');
+        $builder = new CaptchaBuilder(null, $phraseBuilder);
+        $builder->build(80, 35,'vendor/gregwar/captcha/src/Gregwar/Captcha/Font/captcha5.ttf');
+        $code = $builder->getPhrase(); // 获取验证码
         $this->load->driver('cache');
         $ret = $this->cache->redis->save($this->get('verify'), $code, 60);
         // response header 出现 redis_hit_verifycode: 1 表示 redis 连接正常且保存k/v
         header("redis_hit_verifycode: " . $ret);
         // header("veryfiycode: " . $this->get('verify') . "/" . $code);
-        $this->captcha->showImg();
+        header('Content-type: image/jpeg');
+        $builder->output(); // 生成验证码图片
+    }
+
+    // 验证码库2
+    function verifycode2_get()
+    {
+        $this->load->library('Captcha');
+        // redis/mysql 保存 code 与 verify
+        $code = $this->captcha->getCaptcha(); // 获取验证码
+        $this->load->driver('cache');
+        $ret = $this->cache->redis->save($this->get('verify'), $code, 60);
+        // response header 出现 redis_hit_verifycode: 1 表示 redis 连接正常且保存k/v
+        header("redis_hit_verifycode: " . $ret);
+        // header("veryfiycode: " . $this->get('verify') . "/" . $code);
+        $this->captcha->showImg(); // 生成验证码图片
     }
 
     function corpauth_get()
