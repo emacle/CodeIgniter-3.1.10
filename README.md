@@ -68,7 +68,11 @@
         'database' => 'vueadmin',
         ...
     ```
-4. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
+4. 根据 composer.json 初始安装所有插件包 firebase/php-jwt, gregwar/captcha 等
+   ```php
+   composer install
+   ``` 
+5. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
 
     www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v3/"'
 
