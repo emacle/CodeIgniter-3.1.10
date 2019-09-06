@@ -1104,7 +1104,7 @@ abstract class REST_Controller extends CI_Controller {
                 {
                     // multiple ip addresses must be separated using a comma, explode and loop
                     $list_ip_addresses = explode(',', $row->ip_addresses);
-		    $ip_addres = trim($this->input->ip_address());
+                    $ip_addres = trim($this->input->ip_address());
                     $found_address = FALSE;
 
                     foreach ($list_ip_addresses as $ip_address)
