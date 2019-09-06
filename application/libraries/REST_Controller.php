@@ -521,7 +521,7 @@ abstract class REST_Controller extends CI_Controller {
         if ($this->request->format && $this->request->body)
         {
             $this->request->body = Format::factory($this->request->body, $this->request->format)->to_array();
-		    
+
 	    // Assign payload arguments to proper method container
             $this->{'_'.$this->request->method.'_args'} = $this->request->body;
         }
@@ -1104,12 +1104,12 @@ abstract class REST_Controller extends CI_Controller {
                 {
                     // multiple ip addresses must be separated using a comma, explode and loop
                     $list_ip_addresses = explode(',', $row->ip_addresses);
-		    $ip_address = $this->input->ip_address();
+		    $ip_addres = trim($this->input->ip_address());
                     $found_address = FALSE;
 
                     foreach ($list_ip_addresses as $ip_address)
                     {
-                        if ($ip_address === trim($ip_address))
+                        if ($ip_addres === trim($ip_address))
                         {
                             // there is a match, set the the value to TRUE and break out of the loop
                             $found_address = TRUE;
