@@ -1227,7 +1227,7 @@ class User extends REST_Controller
     {
         $phraseBuilder = new PhraseBuilder(4, '0123456789');
         $builder = new CaptchaBuilder(null, $phraseBuilder);
-        $builder->build(80, 35,'vendor/gregwar/captcha/src/Gregwar/Captcha/Font/captcha5.ttf');
+        $builder->build(80, 40,'vendor/gregwar/captcha/src/Gregwar/Captcha/Font/captcha5.ttf');
         $code = $builder->getPhrase(); // 获取验证码
         $this->load->driver('cache');
         $ret = $this->cache->redis->save($this->get('verify'), $code, 60);
@@ -1425,6 +1425,118 @@ class User extends REST_Controller
                     $this->set_response($message, REST_Controller::HTTP_OK);
                     return;
                 }
+            }
+        } else {
+            $message = [
+                "code" => 60206,
+                "data" => ["status" => 'fail', "msg" => $userIdInfo["errmsg"]],
+                "message" => $userIdInfo["errmsg"]
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+    }
+
+    // vux coprauth example
+    function corpauth1_get()
+    {
+        $code = $this->get('code');
+
+        // $corpId = 'xxxxxx';
+        // $appSecret = 'xxxxxx';
+
+        // code: 60206 微信认证失败统一代码
+        if (!$code) {
+            $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
+
+            $message = [
+                "success" => false,
+                "authUrl" => $authUrl
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+
+        // 根据上面的回调参数获取用户详细信息。 已经传递过来code数据。
+        $getCorpAccessTokenUrl = 'https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=' . $corpId . '&corpsecret=' . $appSecret;
+
+        $tokenInfo = $this->http_get($getCorpAccessTokenUrl);
+        $tokenInfo = json_decode($tokenInfo["content"], true); // 获取的原始数据解码成json格式，如下
+        //        array(4) {
+        //        ["errcode"]=>
+        //              int(0)
+        //              ["errmsg"]=>
+        //              string(2) "ok"
+        //                    ["access_token"]=>
+        //              string(214) "vP2TgGlg8-_N23PleQnq2q9SBnIfqCkkNMGZ71YoZ8V3R0lB8sJOy15ixco4kOxo8GZMlcgiJHm0hDXzbL6lG2BWleAqmJCrMEPdQj9goZaogVNBICmVrr-Fxz8YCIBUdf36BOq4E-Mt64OCrIUw1254Pxupi9RGOEFoWmMrJKgHnR_F0pjD-hJFZfTOIt7W2VujJq6hsle8SD9qTOZwzA"
+        //                    ["expires_in"]=>
+        //              int(7200)
+        //            }
+        if ($tokenInfo["errcode"] == 0) {
+            $accessToken = $tokenInfo["access_token"];
+        } else {
+            $message = [
+                "code" => 60206,
+                "data" => ["status" => 'fail', "msg" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"],
+                "message" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"
+            ];
+            $this->set_response($message, REST_Controller::HTTP_OK);
+            return;
+        }
+
+        $getUserIdUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=' . $accessToken . '&code=' . $code;
+        $ajaxUserIdInfo = $this->http_get($getUserIdUrl);
+        $userIdInfo = json_decode($ajaxUserIdInfo["content"], true); // 获取的原始数据解码成json格式，如下
+        //        array(4) {
+        //                ["UserId"]=>
+        //                ["DeviceId"]=>
+        //          string(0) ""
+        //                ["errcode"]=>
+        //          int(0)
+        //          ["errmsg"]=>
+        //          string(2) "ok"
+        //        }
+
+        if ($userIdInfo["errcode"] == 0) {
+            if (array_key_exists("OpenId", $userIdInfo)) {
+                $message = [
+                    "code" => 60206,
+                    "data" => ["success" => 'fail', "msg" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"],
+                    "message" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"
+                ];
+                $this->set_response($message, REST_Controller::HTTP_OK);
+                return;
+
+            } else if (array_key_exists("UserId", $userIdInfo)) {
+                $getUserInfoUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=' . $accessToken . '&userid=' . $userIdInfo["UserId"];
+                $ajaxUserInfo = $this->http_get($getUserInfoUrl);
+                $userInfo = json_decode($ajaxUserInfo["content"], true); // 获取的原始数据解码成json格式，如下
+                $message = [
+                    "code" => 20000,
+                    "data" => $userInfo,
+                    "message" => "微信获取 userInfo 成功!"
+                ];
+                $this->set_response($message, REST_Controller::HTTP_OK);
+                return;
+                //                array(21) {
+                //                    ["errcode"]=>
+                //                      int(0)
+                //                      ["errmsg"]=>
+                //                      string(2) "ok"
+                //                                        ["userid"]=>
+                //                                        ["name"]=>
+                //                      ["position"]=>
+                //                      string(0) ""
+                //                                        ["mobile"]=>
+                //                                        ["gender"]=>
+                //                      string(1) "1"
+                //                                        ["email"]=>
+                //                                        ["avatar"]=>
+                //                      string(85) "http://p.qlogo.cn/bizmail/rZXu0u7ma4vOiaEWia7MTnUDmdDnfgh7R6iafX5832RczKmViadvgbVAhw/"
+                //                                        ["status"]=>
+                //                      int(1)
+                //                    }
+
             }
         } else {
             $message = [
