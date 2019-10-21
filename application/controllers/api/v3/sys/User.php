@@ -1420,7 +1420,7 @@ class User extends REST_Controller
                     $message = [
                         "code" => 60206,
                         "data" => ["status" => 'fail', "msg" => $userInfo["errmsg"]],
-                        "message" => userInfo["errmsg"]
+                        "message" => $userInfo["errmsg"]
                     ];
                     $this->set_response($message, REST_Controller::HTTP_OK);
                     return;
