@@ -30,6 +30,7 @@ class User extends REST_Controller
 
     public function testapi_get()
     {
+        phpinfo();
         echo "test api ok...";
         echo APPPATH . "\n";
         echo SELF . "\n";
@@ -1227,8 +1228,9 @@ class User extends REST_Controller
     {
         $phraseBuilder = new PhraseBuilder(4, '0123456789');
         $builder = new CaptchaBuilder(null, $phraseBuilder);
-        $builder->build(80, 40,'vendor/gregwar/captcha/src/Gregwar/Captcha/Font/captcha5.ttf');
+        $builder->build(80, 40, realpath('vendor/gregwar/captcha/src/Gregwar/Captcha/Font/captcha5.ttf'));
         $code = $builder->getPhrase(); // 获取验证码
+
         $this->load->driver('cache');
         $ret = $this->cache->redis->save($this->get('verify'), $code, 60);
         // response header 出现 redis_hit_verifycode: 1 表示 redis 连接正常且保存k/v
