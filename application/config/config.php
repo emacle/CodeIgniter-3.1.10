@@ -100,7 +100,7 @@ $config['charset'] = 'UTF-8';
 | setting this variable to TRUE (boolean).  See the user guide for details.
 |
 */
-$config['enable_hooks'] = FALSE;
+$config['enable_hooks'] = TRUE;
 
 /*
 |--------------------------------------------------------------------------
@@ -522,3 +522,37 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+
+// JWT 自定义配置
+$config['jwt_key'] = 'pocoyo';
+$config['jwt_access_token_exp'] = 7200; // 单位秒
+$config['jwt_refresh_token_exp'] = 604800; // 单位秒
+$config['jwt_refresh_count'] = 7; // 调用refresh_token接口超过此次数时, 会重置刷新token过期时间
+
+$config['jwt_api_prefix'] = 'api/v2';
+
+// 白名单里的uri不认证
+$config['jwt_white_list'] = [
+    '/sys/user/login',
+    '/sys/user/logout',
+    '/sys/user/refreshtoken', // 刷新token接口需要在控制器内作权限验证,比较特殊
+    // 下面接口uri 可以在菜单权限里面添加,再分配给对应角色即可, 方便/安全?
+    // 如果不想在前端菜单里添加,也可以直接在后端在控制器里单独做token验证,不用做权限认证
+    // 参考/sys/user/refreshtoken
+    '/sys/user/info',
+    '/sys/user/list',
+    '/sys/user/getroleoptions',
+    '/sys/role/allroles',
+    '/sys/role/allmenus',
+    '/sys/role/rolemenu',
+    '/sys/role/rolerole',
+    '/sys/menu/treeoptions'
+];
+
+// 自定义jwt token 过期或异常返回值,根据前端需要可以分开
+// SignatureInvalidException 签名不正确
+// BeforeValidException签名在某个时间点之后才能用
+// ExpiredException token过期
+// Exception 其他错误
+$config['jwt_token_expired'] = ["code" => 50014, "message" => "Token 过期了oo"];
+$config['jwt_token_exception'] = ['code' => 50008, 'message' => "非法的token"];
