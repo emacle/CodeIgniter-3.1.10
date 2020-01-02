@@ -214,14 +214,15 @@ class Base_model extends CI_Model
             return ['code' => 50014, 'message' => "Token 过期了"];
         }
 
-        // TODO: 当token合法时，自动续期?
-        $update_time = time();
-        $expire_time = $update_time + 2 * 60 * 60;  // 2小时过期
-        $data = [
-            'expire_time' => $expire_time,
-            'last_update_time' => $update_time
-        ];
-        $this->_update_key('sys_user_token', $data, ['token' => $token]);
+        // TODO: 当token合法时，到期前30分钟内如果有操作，则自动续期，可减少插入次数?
+        if (($Arr[0]['expire_time'] - $now) < 0.5 * 60 * 60) {
+            $expire_time = $now + 2 * 60 * 60;  // 2小时过期
+            $data = [
+                'expire_time' => $expire_time,
+                'last_update_time' => $now
+            ];
+            $this->_update_key('sys_user_token', $data, ['token' => $token]);
+        }
 
         return ['code' => 20000, 'message' => "Token 合法"];
     }
