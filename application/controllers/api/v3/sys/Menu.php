@@ -1,16 +1,9 @@
 <?php
-
-use Restserver\Libraries\REST_Controller;
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// This can be removed if you use __autoload() in config.php OR use Modular Extensions
-/** @noinspection PhpIncludeInspection */
-//To Solve File REST_Controller not found
-require APPPATH . 'libraries/REST_Controller.php';
-require APPPATH . 'libraries/Format.php';
+use chriskacerguis\RestServer\RestController;
 
-class Menu extends REST_Controller
+class Menu extends RestController
 {
 
     function __construct()
@@ -105,8 +98,7 @@ class Menu extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         // $id = $this->post('id'); // POST param
@@ -127,8 +119,7 @@ class Menu extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['title'] . ' - 菜单添加失败'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 生成该菜单对应的权限: sys_perm, 权限类型为: menu, 生成唯一的 perm_id
@@ -152,7 +143,7 @@ class Menu extends REST_Controller
             "type" => 'success',
             "message" => $parms['title'] . ' - 菜单添加成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 改
@@ -162,8 +153,7 @@ class Menu extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         // $id = $this->post('id'); // POST param
@@ -177,7 +167,7 @@ class Menu extends REST_Controller
                 "type" => 'error',
                 "message" => '父节点不能是自己'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
         // 菜单类型为目录
         if ($parms['type'] == 0) {
@@ -199,8 +189,7 @@ class Menu extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['title'] . ' - 菜单更新错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -208,7 +197,7 @@ class Menu extends REST_Controller
             "type" => 'success',
             "message" => $parms['title'] . ' - 菜单更新成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 删
@@ -218,8 +207,7 @@ class Menu extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -234,8 +222,7 @@ class Menu extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['title'] . ' - 存在子节点不能删除'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 删除外键关联表 sys_role_perm , sys_perm, sys_menu
@@ -262,8 +249,7 @@ class Menu extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['title'] . ' - 菜单删除错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -271,8 +257,7 @@ class Menu extends REST_Controller
             "type" => 'success',
             "message" => $parms['title'] . ' - 菜单删除成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
-
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 查
@@ -283,8 +268,7 @@ class Menu extends REST_Controller
 
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $MenuTreeArr = $this->permission->getPermission($Token, 'menu', true);
@@ -293,7 +277,7 @@ class Menu extends REST_Controller
             "code" => 20000,
             "data" => $MenuTree,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 根据token拉取 treeselect 下拉选项菜单
@@ -305,7 +289,7 @@ class Menu extends REST_Controller
         //        $Token = $this->input->get_request_header('X-Token', TRUE);
         //        $retPerm = $this->permission->HasPermit($Token, $uri);
         //        if ($retPerm['code'] != 50000) {
-        //            $this->set_response($retPerm, REST_Controller::HTTP_OK);
+        //            $this->response($retPerm, RestController::HTTP_OK);
         //            return;
         //        }
 
@@ -319,7 +303,7 @@ class Menu extends REST_Controller
             "code" => 20000,
             "data" => $MenuTree,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
 
@@ -343,14 +327,14 @@ class Menu extends REST_Controller
                     "items" => $List
                 ]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 50008,
                 "message" => 'Login failed, unable to get user details.'
             ];
 
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
 
     }

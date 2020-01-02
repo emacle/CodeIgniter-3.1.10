@@ -68,7 +68,7 @@
         'database' => 'vueadmin',
         ...
     ```
-4. 根据 composer.json 初始安装所有插件包 firebase/php-jwt, gregwar/captcha 等
+4. 根据 composer.json 初始安装所有插件包 firebase/php-jwt, gregwar/captcha, chriskacerguis/codeigniter-restserver 等
    ```php
    composer install
    ``` 

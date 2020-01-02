@@ -1,16 +1,9 @@
 <?php
-
-use Restserver\Libraries\REST_Controller;
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// This can be removed if you use __autoload() in config.php OR use Modular Extensions
-/** @noinspection PhpIncludeInspection */
-//To Solve File REST_Controller not found
-require APPPATH . 'libraries/REST_Controller.php';
-require APPPATH . 'libraries/Format.php';
+use chriskacerguis\RestServer\RestController;
 
-class Dept extends REST_Controller
+class Dept extends RestController
 {
 
     function __construct()
@@ -28,8 +21,7 @@ class Dept extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -41,8 +33,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 机构名称重复'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $dept_id = $this->Base_model->_insert_key('sys_dept', $parms);
@@ -52,8 +43,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 机构新增失败'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 超级管理员用户的超级管理员角色自动归属该机构
@@ -69,7 +59,7 @@ class Dept extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 机构新增成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 改
@@ -79,8 +69,7 @@ class Dept extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         // $id = $this->post('id'); // POST param
@@ -98,8 +87,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 上级机构不能为自己'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $where = ["id" => $id];
@@ -110,8 +98,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 机构更新错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -119,7 +106,7 @@ class Dept extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 机构更新成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 删
@@ -129,8 +116,7 @@ class Dept extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -145,8 +131,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 存在子节点不能删除'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 先删除外键关联表
@@ -156,8 +141,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => '删除关联表失败 ' . json_encode($parms)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 删除基础表 sys_dept
@@ -167,8 +151,7 @@ class Dept extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 机构删除失败'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -176,8 +159,7 @@ class Dept extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 机构删除成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
-
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 查
@@ -188,8 +170,7 @@ class Dept extends REST_Controller
 
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $DeptArr = $this->Dept_model->getDeptList();
@@ -199,7 +180,7 @@ class Dept extends REST_Controller
             "code" => 20000,
             "data" => $DeptTree,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
 }

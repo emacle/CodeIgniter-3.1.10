@@ -1,16 +1,9 @@
 <?php
-
-use Restserver\Libraries\REST_Controller;
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// This can be removed if you use __autoload() in config.php OR use Modular Extensions
-/** @noinspection PhpIncludeInspection */
-//To Solve File REST_Controller not found
-require APPPATH . 'libraries/REST_Controller.php';
-require APPPATH . 'libraries/Format.php';
+use chriskacerguis\RestServer\RestController;
 
-class Role extends REST_Controller
+class Role extends RestController
 {
 
     function __construct()
@@ -106,8 +99,7 @@ class Role extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -118,8 +110,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色名重复'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 加入新增时间
@@ -132,8 +123,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色新增失败'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 生成该角色对应的权限: sys_perm, 权限类型为: role, 生成唯一的 perm_id
@@ -157,7 +147,7 @@ class Role extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 角色新增成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 改
@@ -167,8 +157,7 @@ class Role extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         // $id = $this->post('id'); // POST param
@@ -183,8 +172,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色不允许修改'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $id = $parms['id'];
@@ -200,8 +188,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色更新错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -209,7 +196,7 @@ class Role extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 角色更新成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 删
@@ -219,8 +206,7 @@ class Role extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -234,8 +220,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色不允许删除'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 删除外键关联表 sys_role_perm , sys_perm, sys_role, sys_user_role
@@ -265,8 +250,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['name'] . ' - 角色删除错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -274,8 +258,7 @@ class Role extends REST_Controller
             "type" => 'success',
             "message" => $parms['name'] . ' - 角色删除成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
-
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 查
@@ -286,8 +269,7 @@ class Role extends REST_Controller
 
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $RoleArr = $this->Role_model->getRoleList();
@@ -295,7 +277,7 @@ class Role extends REST_Controller
             "code" => 20000,
             "data" => $RoleArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 获取所有菜单 不需权限验证
@@ -308,8 +290,7 @@ class Role extends REST_Controller
                 "data" => $MenuTreeArr,
                 "message" => "数据库表中没有菜单"
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $MenuTree = $this->permission->genVueMenuTree($MenuTreeArr, 'id', 'pid', 0);
@@ -317,7 +298,7 @@ class Role extends REST_Controller
             "code" => 20000,
             "data" => $MenuTree,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 获取所有角色带perm_id 不需权限验证
@@ -330,15 +311,14 @@ class Role extends REST_Controller
                 "data" => $AllRolesArr,
                 "message" => "数据库表中没有角色"
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
             "code" => 20000,
             "data" => $AllRolesArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     //  获取角色拥有的菜单权限 不需权限验证
@@ -352,7 +332,7 @@ class Role extends REST_Controller
             "code" => 20000,
             "data" => $MenuTreeArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 获取角色拥有的角色权限 不需权限验证
@@ -366,7 +346,7 @@ class Role extends REST_Controller
             "code" => 20000,
             "data" => $RoleRoleArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 保存角色对应权限
@@ -383,8 +363,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => '超级管理员角色拥有所有权限，不允许修改！'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $RolePermArr = $this->Role_model->getRolePerm($parms['roleId']);
@@ -407,8 +386,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => '授权失败 ' . json_encode($failedArr)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $DelArr = $this->permission->array_diff_assoc2($RolePermArr, $parms['rolePerms']);
@@ -429,8 +407,7 @@ class Role extends REST_Controller
                 "type" => 'error',
                 "message" => '授权失败 ' . json_encode($failedArr)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -439,7 +416,7 @@ class Role extends REST_Controller
             "data" => $parms,
             "message" => '授权操作成功',
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
 
@@ -463,14 +440,14 @@ class Role extends REST_Controller
                     "items" => $List
                 ]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 50008,
                 "message" => 'Login failed, unable to get user details.'
             ];
 
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
 
     }

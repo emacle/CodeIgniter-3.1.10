@@ -1,18 +1,11 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
 
-use Restserver\Libraries\REST_Controller;
+use chriskacerguis\RestServer\RestController;
 use Gregwar\Captcha\CaptchaBuilder;
 use Gregwar\Captcha\PhraseBuilder;
 
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-// This can be removed if you use __autoload() in config.php OR use Modular Extensions
-/** @noinspection PhpIncludeInspection */
-//To Solve File REST_Controller not found
-require APPPATH . 'libraries/REST_Controller.php';
-require APPPATH . 'libraries/Format.php';
-
-class User extends REST_Controller
+class User extends RestController
 {
 
     function __construct()
@@ -138,8 +131,7 @@ class User extends REST_Controller
 
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();
@@ -186,7 +178,7 @@ class User extends REST_Controller
                 'total' => intval($total)
             ]
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 增
@@ -196,8 +188,7 @@ class User extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -220,8 +211,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => '所选的角色没有关联对应机构, 请检查'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $RoleDeptArr = $parms['roledepts'];
@@ -240,8 +230,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['username'] . ' - 用户新增失败'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $failed = false;
@@ -263,8 +252,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => '用户关联角色机构失败 ' . json_encode($failedArr)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -272,7 +260,7 @@ class User extends REST_Controller
             "type" => 'success',
             "message" => $parms['username'] . ' - 用户新增成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 改
@@ -282,8 +270,7 @@ class User extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         // $id = $this->post('id'); // POST param
@@ -298,8 +285,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['username'] . ' - 超级管理员用户不允许修改'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $failed = false;
@@ -319,8 +305,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => '所选的角色没有关联对应机构, 请检查'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $id = $parms['id'];
@@ -345,8 +330,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['username'] . ' - 用户更新错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $RoleSqlArr = $this->User_model->getRolesByUserId($id);
@@ -369,8 +353,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => '用户关联角色失败 ' . json_encode($failedArr)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $DelArr = $this->permission->array_diff_assoc2($RoleSqlArr, $RoleArr);
@@ -391,8 +374,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => '用户关联角色失败 ' . json_encode($failedArr)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -400,7 +382,7 @@ class User extends REST_Controller
             "type" => 'success',
             "message" => $parms['username'] . ' - 用户更新成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     // 删
@@ -410,8 +392,7 @@ class User extends REST_Controller
         $Token = $this->input->get_request_header('X-Token', TRUE);
         $retPerm = $this->permission->HasPermit($Token, $uri);
         if ($retPerm['code'] != 50000) {
-            $this->set_response($retPerm, REST_Controller::HTTP_OK);
-            return;
+            $this->response($retPerm, RestController::HTTP_OK);
         }
 
         $parms = $this->post();  // 获取表单参数，类型为数组
@@ -425,8 +406,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['username'] . ' - 超级管理员不允许删除'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 删除外键关联表 sys_user_role
@@ -439,8 +419,7 @@ class User extends REST_Controller
                 "type" => 'error',
                 "message" => $parms['username'] . ' - 用户删除错误'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $message = [
@@ -448,7 +427,7 @@ class User extends REST_Controller
             "type" => 'success',
             "message" => $parms['username'] . ' - 用户删除成功'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
 
     }
 
@@ -465,8 +444,7 @@ class User extends REST_Controller
                 "code" => 60205,
                 "message" => '验证码错误！'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $result = $this->User_model->validate($username, md5($password));
@@ -485,8 +463,8 @@ class User extends REST_Controller
                 $ret = $this->User_model->getCurrentRole($result['userinfo']['id']);
                 if ($ret['code'] !== '20000') {
                     // 自定义code 未分配角色或角色被删除，用户没有可用角色
-                    $this->set_response($ret, REST_Controller::HTTP_OK);
-                    return;
+                    $this->response($ret, RestController::HTTP_OK);
+
                 }
                 $CurrentRole = $ret['role_id'];
             }
@@ -503,8 +481,7 @@ class User extends REST_Controller
                     "code" => 20000,
                     "message" => 'Token 创建失败, 请联系管理员.'
                 ];
-                $this->set_response($message, REST_Controller::HTTP_OK);
-                return;
+                $this->response($message, RestController::HTTP_OK);
             }
 
             $message = [
@@ -513,13 +490,13 @@ class User extends REST_Controller
                     "token" => $Token
                 ]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 60204,
                 "message" => 'Account and password are incorrect.'
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
     }
 
@@ -549,8 +526,7 @@ class User extends REST_Controller
                         "type" => 'error',
                         "message" => '角色切换失败,该角色没有对应的部门机构，请联系管理员分配'
                     ];
-                    $this->set_response($message, REST_Controller::HTTP_OK);
-                    return;
+                    $this->response($message, RestController::HTTP_OK);
                 }
 
                 if (!$this->Base_model->_update_key('sys_user_token', ['role_id' => $this->get('token')], ['token' => $Token])) {
@@ -559,8 +535,7 @@ class User extends REST_Controller
                         "type" => 'error',
                         "message" => '角色切换失败'
                     ];
-                    $this->set_response($message, REST_Controller::HTTP_OK);
-                    return;
+                    $this->response($message, RestController::HTTP_OK);
                 }
             }
 
@@ -673,14 +648,14 @@ class User extends REST_Controller
                 "_SERVER" => $_SERVER,
                 "_GET" => $_GET
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 50008,
                 "message" => 'Login failed, unable to get user details.'
             ];
 
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
 
     }
@@ -694,7 +669,7 @@ class User extends REST_Controller
         //        $Token = $this->input->get_request_header('X-Token', TRUE);
         //        $retPerm = $this->permission->HasPermit($Token, $uri);
         //        if ($retPerm['code'] != 50000) {
-        //            $this->set_response($retPerm, REST_Controller::HTTP_OK);
+        //            $this->response($retPerm, RestController::HTTP_OK);
         //            return;
         //        }
 
@@ -705,7 +680,7 @@ class User extends REST_Controller
             "code" => 20000,
             "data" => $RoleArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     function deptoptions_get()
@@ -716,7 +691,7 @@ class User extends REST_Controller
         //        $Token = $this->input->get_request_header('X-Token', TRUE);
         //        $retPerm = $this->permission->HasPermit($Token, $uri);
         //        if ($retPerm['code'] != 50000) {
-        //            $this->set_response($retPerm, REST_Controller::HTTP_OK);
+        //            $this->response($retPerm, RestController::HTTP_OK);
         //            return;
         //        }
 
@@ -727,7 +702,7 @@ class User extends REST_Controller
             "code" => 20000,
             "data" => $DeptArr,
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     //    async router test get
@@ -796,14 +771,14 @@ class User extends REST_Controller
                 ],
 
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 50008,
                 "message" => 'Login failed, unable to get user details.'
             ];
 
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
 
     }
@@ -814,7 +789,7 @@ class User extends REST_Controller
             "code" => 20000,
             "data" => 'success'
         ];
-        $this->set_response($message, REST_Controller::HTTP_OK);
+        $this->response($message, RestController::HTTP_OK);
     }
 
     function list_get()
@@ -837,14 +812,14 @@ class User extends REST_Controller
                     "items" => $List
                 ]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 50008,
                 "message" => 'Login failed, unable to get user details.'
             ];
 
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
 
     }
@@ -1268,8 +1243,7 @@ class User extends REST_Controller
                 "data" => ["status" => 'fail', "msg" => 'code参数为空'],
                 "message" => "code参数为空"
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 根据上面的回调参数获取用户详细信息。 已经传递过来code数据。
@@ -1295,8 +1269,7 @@ class User extends REST_Controller
                 "data" => ["status" => 'fail', "msg" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"],
                 "message" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $getUserIdUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=' . $accessToken . '&code=' . $code;
@@ -1319,8 +1292,7 @@ class User extends REST_Controller
                     "data" => ["success" => 'fail', "msg" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"],
                     "message" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"
                 ];
-                $this->set_response($message, REST_Controller::HTTP_OK);
-                return;
+                $this->response($message, RestController::HTTP_OK);
 
             } else if (array_key_exists("UserId", $userIdInfo)) {
                 $getUserInfoUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=' . $accessToken . '&userid=' . $userIdInfo["UserId"];
@@ -1375,8 +1347,7 @@ class User extends REST_Controller
                             $ret = $this->User_model->getCurrentRole($user[0]['id']);
                             if ($ret['code'] !== '20000') {
                                 // 自定义code 未分配角色或角色被删除，用户没有可用角色
-                                $this->set_response($ret, REST_Controller::HTTP_OK);
-                                return;
+                                $this->response($ret, RestController::HTTP_OK);
                             }
                             $CurrentRole = $ret['role_id'];
                         }
@@ -1395,8 +1366,7 @@ class User extends REST_Controller
                                 "data" => ["status" => 'fail', "msg" => "Token 创建失败, 请联系管理员."],
                                 "message" => 'Token 创建失败, 请联系管理员.'
                             ];
-                            $this->set_response($message, REST_Controller::HTTP_OK);
-                            return;
+                            $this->response($message, RestController::HTTP_OK);
                         }
 
                         $message = [
@@ -1406,7 +1376,7 @@ class User extends REST_Controller
                                 "token" => $Token
                             ]
                         ];
-                        $this->set_response($message, REST_Controller::HTTP_OK);
+                        $this->response($message, RestController::HTTP_OK);
 
                     } else {
                         $message = [
@@ -1414,8 +1384,7 @@ class User extends REST_Controller
                             "data" => ["status" => 'fail', "msg" => "此微信账号(" . $userInfo['name'] . ")没有与系统账号关联,请联系系统管理员!"],
                             "message" => "此微信账号(" . $userInfo['name'] . ")没有与系统账号关联,请联系系统管理员!"
                         ];
-                        $this->set_response($message, REST_Controller::HTTP_OK);
-                        return;
+                        $this->response($message, RestController::HTTP_OK);
                     }
 
                 } else {
@@ -1424,8 +1393,7 @@ class User extends REST_Controller
                         "data" => ["status" => 'fail', "msg" => $userInfo["errmsg"]],
                         "message" => $userInfo["errmsg"]
                     ];
-                    $this->set_response($message, REST_Controller::HTTP_OK);
-                    return;
+                    $this->response($message, RestController::HTTP_OK);
                 }
             }
         } else {
@@ -1434,8 +1402,7 @@ class User extends REST_Controller
                 "data" => ["status" => 'fail', "msg" => $userIdInfo["errmsg"]],
                 "message" => $userIdInfo["errmsg"]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
     }
 
@@ -1455,8 +1422,7 @@ class User extends REST_Controller
                 "success" => false,
                 "authUrl" => $authUrl
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         // 根据上面的回调参数获取用户详细信息。 已经传递过来code数据。
@@ -1482,8 +1448,7 @@ class User extends REST_Controller
                 "data" => ["status" => 'fail', "msg" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"],
                 "message" => $tokenInfo["errmsg"] ? $tokenInfo["errmsg"] : "企业认证失败!"
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
 
         $getUserIdUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/getuserinfo?access_token=' . $accessToken . '&code=' . $code;
@@ -1506,8 +1471,7 @@ class User extends REST_Controller
                     "data" => ["success" => 'fail', "msg" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"],
                     "message" => "不是企业成员!请联系企业管理员,添加您的账号的企业通讯录!"
                 ];
-                $this->set_response($message, REST_Controller::HTTP_OK);
-                return;
+                $this->response($message, RestController::HTTP_OK);
 
             } else if (array_key_exists("UserId", $userIdInfo)) {
                 $getUserInfoUrl = 'https://qyapi.weixin.qq.com/cgi-bin/user/get?access_token=' . $accessToken . '&userid=' . $userIdInfo["UserId"];
@@ -1518,8 +1482,7 @@ class User extends REST_Controller
                     "data" => $userInfo,
                     "message" => "微信获取 userInfo 成功!"
                 ];
-                $this->set_response($message, REST_Controller::HTTP_OK);
-                return;
+                $this->response($message, RestController::HTTP_OK);
                 //                array(21) {
                 //                    ["errcode"]=>
                 //                      int(0)
@@ -1546,8 +1509,7 @@ class User extends REST_Controller
                 "data" => ["status" => 'fail', "msg" => $userIdInfo["errmsg"]],
                 "message" => $userIdInfo["errmsg"]
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
-            return;
+            $this->response($message, RestController::HTTP_OK);
         }
     }
 }

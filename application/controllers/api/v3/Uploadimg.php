@@ -1,18 +1,10 @@
 <?php
-
-use Restserver\Libraries\REST_Controller;
-
 defined('BASEPATH') OR exit('No direct script access allowed');
 
-// This can be removed if you use __autoload() in config.php OR use Modular Extensions
-/** @noinspection PhpIncludeInspection */
-//To Solve File REST_Controller not found
-require APPPATH . 'libraries/REST_Controller.php';
-require APPPATH . 'libraries/Format.php';
+use chriskacerguis\RestServer\RestController;
 
-//require APPPATH . 'libraries/kindeditor/php/JSON.php';
 
-class Uploadimg extends REST_Controller
+class Uploadimg extends RestController
 {
 
     function __construct()
@@ -193,7 +185,7 @@ class Uploadimg extends REST_Controller
             ];
 
             echo json_encode($message);
-            //            $this->set_response($message, REST_Controller::HTTP_OK);
+            //            $this->response($message, RestController::HTTP_OK);
             // alert里面使用时 exit() 产生的是空，或字符串，使用原生的json_encode返回统一的字符串，在客户端在统一处理成对象
         }
     }
@@ -271,7 +263,7 @@ class Uploadimg extends REST_Controller
         echo json_encode($message);
         exit();
         //        var_dump($message);
-        //        $this->set_response($message, REST_Controller::HTTP_OK);
+        //        $this->response($message, RestController::HTTP_OK);
         //        die();
     }
 
@@ -309,14 +301,14 @@ class Uploadimg extends REST_Controller
                 "message" => '写入数据库表成功,请请待审核通知!',
                 "data" => array_merge($where, $data)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         } else {
             $message = [
                 "code" => 20000,
                 "message" => '写入数据库表失败!',
                 "data" => array_merge($where, $data)
             ];
-            $this->set_response($message, REST_Controller::HTTP_OK);
+            $this->response($message, RestController::HTTP_OK);
         }
     }
 
