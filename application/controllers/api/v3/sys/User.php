@@ -1137,8 +1137,9 @@ class User extends RestController
         // $appSecret = "fsdfsfsdf";
         // $localAuthUrl = "http://dj.xxx.com:7000/hotcode/";
 
-        if (!array_key_exists("code", $_REQUEST)) {
 
+        if (!array_key_exists("code", $_REQUEST)) {
+            // 根据实际回调地址获取回调 $redirectUri **必须**
             // $redirectUri = urlencode("http://yw.xxx.com/xxx/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
             echo json_encode(array("success" => false, "authUrl" => $authUrl));
@@ -1412,13 +1413,17 @@ class User extends RestController
     {
         $code = $this->get('code');
 
-        // 需要正确配置企业ID及appSecret, 登录企业微信后台查看
+        // 需要正确配置企业ID及appSecret, 登录企业微信后台查看  **必须**
         // $corpId = 'xxxxxx';
+        // $agentId = '1000014';
         // $appSecret = 'xxxxxx';
-        // $localAuthUrl = "http://www.vueadmin.com:9100";
+        // $localAuthUrl = "http://dj.xxx.com:7001";
+
 
         // code: 60206 微信认证失败统一代码
         if (!$code) {
+            // 根据实际回调地址获取回调 $redirectUri **必须**
+            // $redirectUri = urlencode("http://yw.xxxxx.com/ksh/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
 
             $message = [
