@@ -1233,6 +1233,7 @@ class User extends RestController
     {
         $code = $this->get('code');
 
+        // 需要正确配置企业ID及appSecret, 登录企业微信后台查看
         // $corpId = 'xxxxxx';
         // $appSecret = 'xxxxxx';
 
@@ -1411,8 +1412,10 @@ class User extends RestController
     {
         $code = $this->get('code');
 
+        // 需要正确配置企业ID及appSecret, 登录企业微信后台查看
         // $corpId = 'xxxxxx';
         // $appSecret = 'xxxxxx';
+        // $localAuthUrl = "http://www.vueadmin.com:9100";
 
         // code: 60206 微信认证失败统一代码
         if (!$code) {

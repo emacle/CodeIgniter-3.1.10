@@ -2,6 +2,8 @@
 
 **V3 版本加入动态切换角色功能，不同角色功能不同，同时也可归属不同的部门**
 
+**v3版本前后端均使用 develop 分支,token设计存储在数据库表sys_user_token中, 使用时需要 checkout develop, 开启jwt分支用于以php-jwt生成jwt-token重构**
+
 基于 vue-element-admin 和 PHP CodeIgniter RESTful 实现，
 采用前后端分离架构的权限管理系统，PHP快速开发平台，目标是搭建一
 套简洁易用的快速解决方案，可以帮助用户有效降低项目开发难度和成本。
@@ -14,10 +16,11 @@
 其余组件如 tags-views等，全部未做变化，可根据需要具体需求进行删减。 
 
 ## demo地址
+ [vue-php-admin-V3](http://222.40.42.139:7002/)
  [vue-php-admin](http://172.30.3.11:7000/)
 
 ## 功能介绍
-1. 系统登录：系统用户登录，系统登录认证（token方式）
+1. 系统登录：系统用户登录，系统登录认证（token方式），**企业微信扫码登录（测试success）**
 2. 用户管理：新建用户，修改用户，删除用户，查询用户
 3. 角色管理：新建角色，修改角色，删除角色，查询角色
 4. 菜单管理：新建菜单，修改菜单，删除菜单，查询菜单
@@ -68,16 +71,12 @@
         'database' => 'vueadmin',
         ...
     ```
-4. 根据 composer.json 初始安装所有插件包 firebase/php-jwt, gregwar/captcha, chriskacerguis/codeigniter-restserver 等
-   ```php
-   composer install
-   ``` 
-5. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
+4. 使用 phpstudy 配置站点域名管理, 同时修改hosts文件（可选）
 
     www.cirest.com:8889  **注意与前端接口配置一致** BASE_API: '"http://www.cirest.com:8889/api/v3/"'
 
     接口调用使用示例：
-    ```html    
+    ```html
     http://www.cirest.com:8889/api/v2/sys/menu/testapi
     http://www.cirest.com:8889/index.php/api/v2/sys/menu/testapi
     
@@ -101,12 +100,17 @@
  - phpstrom
  - vscode
 
+## 企业微信登录效果
+![角色切换](static/screenshot/weixin_login.gif)
+
 ## 截图
- 
- ![菜单](vue-element-admin/static/screenshot/menu.png)
- ![菜单新增](vue-element-admin/static/screenshot/menu_add.png)
- ![菜单查询](vue-element-admin/static/screenshot/menu_search.png) 
- ![角色/授权](vue-element-admin/static/screenshot/role.png)
- ![角色新增](vue-element-admin/static/screenshot/role2.png)
- ![用户管理](vue-element-admin/static/screenshot/user.png)
- ![用户新增](vue-element-admin/static/screenshot/user_add.png)
+ ![角色切换](static/screenshot/role_switch.png)
+ ![角色切换](static/screenshot/role_switch.png)
+ ![菜单](static/screenshot/menu.png)
+ ![菜单新增](static/screenshot/menu_add.png)
+ ![菜单查询](static/screenshot/menu_search.png) 
+ ![角色/授权](static/screenshot/role.png)
+ ![角色新增](static/screenshot/role2.png)
+ ![用户管理](static/screenshot/user.png)
+ ![用户新增](static/screenshot/user_add.png)
+ ![机构管理](static/screenshot/dept.png)
