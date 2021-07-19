@@ -546,7 +546,7 @@ class User extends RestController
             // $info['avatar'] = "https://wpimg.wallstcn.com/f778738c-e4f8-4870-b634-56703b4acafe.gif";
             $info['name'] = "Super Admin";
             $info['identify'] = "410000000000000000";
-            $info['phone'] = "13633838282";
+            $info['phone'] = "1388088888";
 
             // 当前用户的当前角色拥有的部门
 //            $info['depts'] = $this->User_model->getCurrentDeptByToken($Token); // 当前选择部门;
@@ -1135,12 +1135,12 @@ class User extends RestController
         // $corpId = "wwxxxxxxxx";
         // $agentId = "100000";
         // $appSecret = "fsdfsfsdf";
-        // $localAuthUrl = "http://dj.xxx.com:7000/hotcode/";
+        // $localAuthUrl = "http://xj.xxx.com:8000/hotcode/";
 
 
         if (!array_key_exists("code", $_REQUEST)) {
             // 根据实际回调地址获取回调 $redirectUri **必须**
-            // $redirectUri = urlencode("http://yw.xxx.com/xxx/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
+            // $redirectUri = urlencode("http://ww.xxx.com/xxx/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
             echo json_encode(array("success" => false, "authUrl" => $authUrl));
             die();
@@ -1415,15 +1415,15 @@ class User extends RestController
 
         // 需要正确配置企业ID及appSecret, 登录企业微信后台查看  **必须**
         // $corpId = 'xxxxxx';
-        // $agentId = '1000014';
+        // $agentId = '1000001';
         // $appSecret = 'xxxxxx';
-        // $localAuthUrl = "http://dj.xxx.com:7001";
+        // $localAuthUrl = "http://xj.xxx.com:8001";
 
 
         // code: 60206 微信认证失败统一代码
         if (!$code) {
             // 根据实际回调地址获取回调 $redirectUri **必须**
-            // $redirectUri = urlencode("http://yw.xxxxx.com/ksh/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
+            // $redirectUri = urlencode("http://ww.xxxxx.com/ksh/get-corp-weixin-code.html?redirect_uri=" . urlencode($localAuthUrl));
             $authUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" . $corpId . "&redirect_uri=" . $redirectUri . "&response_type=code&scope=snsapi_privateinfo&agentid=" . $agentId . "&state=STATE#wechat_redirect";
 
             $message = [
